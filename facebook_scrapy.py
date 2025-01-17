@@ -1,33 +1,44 @@
-import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import time
 
-access_token = 'YOUR_ACCESS_TOKEN'
-user_id = 'PERSON_ID'
-fields = 'birthday,about'
-url = f'https://graph.facebook.com/v18.0/{user_id}?fields={fields}&access_token={access_token}'
+# 初始化浏览器驱动
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
-response = requests.get(url)
-if response.status_code == 200:
-    data = response.json()
-    birthday = data.get('birthday')
-    about = data.get('about')
-    print(f"Birthday: {birthday}, About: {about}")
-else:
-    print(f"Error: {response.status_code} - {response.text}")
+# 打开 Facebook 登录页面
+driver.get('https://www.facebook.com/')
+
+# 等待页面加载
+time.sleep(5)
+
+# 找到用户名和密码输入框并输入
+username_input = driver.find_element(By.ID, 'email')
+username_input.send_keys('61571407847012')
+
+password_input = driver.find_element(By.ID, 'pass')
+password_input.send_keys('Bo0701loco1995')
+
+# 找到登录按钮并点击
+login_button = driver.find_element(By.NAME, 'login')
+login_button.click()
+
+# 等待登录完成
+time.sleep(10)
 
 
+# 假设我们要访问的人物 ID 为 '123456789'，根据人物 ID 访问页面
+person_id = '61571407847012 '
+driver.get(f'https://www.facebook.com/profile.php?id={person_id}')
 
+# 等待页面加载
+time.sleep(10)
 
+# 尝试提取出生年月，这里假设出生年月在一个元素中，其 class 为 'birth-date'
+birth_date_element = driver.find_element(By.CLASS_NAME, 'birth-date')
+birth_date = birth_date_element.text
+print(birth_date)
 
-access_token = 'YOUR_ACCESS_TOKEN'
-user_id = 'PERSON_ID'
-url = f'https://graph.facebook.com/v18.0/{user_id}/friends?access_token={access_token}'
-
-response = requests.get(url)
-if response.status_code == 200:
-    data = response.json()
-    friends = data.get('data', [])
-    for friend in friends:
-        friend_id = friend.get('id')
-        print(f"Friend ID: {friend_id}")
-else:
-    print(f"Error: {response.status_code} - {response.text}")
+# 关闭浏览器
+driver.quit()
